@@ -42,17 +42,23 @@ Future<void> init() async {
     () => NumberTriviaRemoteDataSourceImpl(httpClient: sl()),
   );
 
-  sl.registerLazySingleton<NumberTriviaLocalDataSource>(
+  // sl.registerLazySingleton<NumberTriviaLocalDataSource>(
+  //   () => NumberTriviaLocalDataSourceImpl(sharedPreferences: sl()),
+  // );
+  sl.registerSingletonAsync<SharedPreferences>(
+      () async => await SharedPreferences.getInstance());
+  sl.registerSingletonWithDependencies<NumberTriviaLocalDataSource>(
     () => NumberTriviaLocalDataSourceImpl(sharedPreferences: sl()),
+    dependsOn: [SharedPreferences],
   );
 
   //* Core
   sl.registerLazySingleton(() => InputConverter());
 
   //* External
-  // sl.registerSingletonAsync(() => null)
-  final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
+
+  // final sharedPreferences = await SharedPreferences.getInstance();
+  // sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => DataConnectionChecker());
 }
